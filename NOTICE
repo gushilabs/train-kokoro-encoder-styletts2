@@ -1,0 +1,37 @@
+kokoro-deutsch
+Copyright 2026 semidark
+
+This project contains code from the following open-source projects:
+
+────────────────────────────────────────────────────────────────────────────────
+
+kokoro/ — Kokoro TTS inference package (git submodule)
+  Source:  https://github.com/hexgrad/kokoro
+  Fork:    https://github.com/semidark/kokoro (branch: main)
+  License: Apache License 2.0
+  Author:  hexgrad
+  Changes: Fork includes German language support (`'d'`) in pipeline/CLI.
+
+────────────────────────────────────────────────────────────────────────────────
+
+StyleTTS2/ — Training code (git submodule)
+  Source:  https://github.com/yl4579/StyleTTS2
+  Fork:    https://github.com/semidark/StyleTTS2 (branch: main)
+  License: MIT License
+  Author:  Yinghao Aaron Li (yl4579)
+  Changes: See the commit history on the main branch for a full
+           list of patches. Summary:
+           - Migrated weight_norm/spectral_norm to parametrizations API
+           - Fixed multiple training bugs (F0 shape, checkpoint save order,
+             missing .train() mode, hardcoded breakpoint, torch.load defaults)
+           - Added Kokoro-82M symbol table (kokoro_symbols.py)
+           - Filtered sequences exceeding PLBERT max length (meldataset.py)
+
+────────────────────────────────────────────────────────────────────────────────
+
+The following directories contain original work by this project's contributors:
+
+  scripts/     — Dataset preparation, voicepack extraction, inference testing
+  configs/     — Training configuration for German fine-tuning
+  docs/        — Training guide and documentation
+  training/    — Training data lists and OOD texts (audio files excluded)
