@@ -1,26 +1,19 @@
 #!/usr/bin/env python3
 """
-Kokoro German: Test Inference
+Kokoro: Test Inference
 ==============================
-Tests the fine-tuned Kokoro model with a German phonetic test set.
+Tests the fine-tuned Kokoro model with a  phonetic test set.
+
+Pre-requisites:
+    pip install -q kokoro>=0.9.4 soundfile
+    apt-get -qq -y install espeak-ng > /dev/null 2>&1
 
 Usage:
-    # Convert checkpoint + run inference
-    python scripts/test_inference.py \
-        --checkpoint StyleTTS2/logs/kokoro_german/epoch_1st_00002.pth \
-        --voicepack voices/dm_daniel_epoch3.pt \
-        --output-dir test_output/epoch3
+    python test_inference.py \
+        --checkpoint ~/Downloads/models/Kokoro2nd-LibriTTS/epoch_2nd_00000.pth \
+        --voicepack voices/am_2nd_speaker78.pt \
+        --output-dir test_output/epoch0
 
-    # Use a previously converted model
-    python scripts/test_inference.py \
-        --model voices/kokoro_german_epoch3.pth \
-        --voicepack voices/dm_daniel_epoch3.pt
-
-    # Run on CPU
-    python scripts/test_inference.py \
-        --checkpoint StyleTTS2/logs/kokoro_german/epoch_1st_00002.pth \
-        --voicepack voices/dm_daniel_epoch3.pt \
-        --device cpu
 """
 
 import argparse
@@ -28,10 +21,10 @@ import sys
 from pathlib import Path
 
 # Prefer the kokoro submodule over any pip-installed kokoro package
-_repo_root = Path(__file__).resolve().parents[1]
-_kokoro_submodule = _repo_root / "kokoro"
-if _kokoro_submodule.exists() and str(_kokoro_submodule) not in sys.path:
-    sys.path.insert(0, str(_kokoro_submodule))
+#_repo_root = Path(__file__).resolve().parents[1]
+#_kokoro_submodule = _repo_root / "kokoro"
+#if _kokoro_submodule.exists() and str(_kokoro_submodule) not in sys.path:
+#    sys.path.insert(0, str(_kokoro_submodule))
 
 TEST_SENTENCES = [
     "The quick brown fox jumps over the lazy dog.",
@@ -102,11 +95,12 @@ def run_inference(
 
     # Load model with our fine-tuned weights and config
     print(f"Loading model from: {model_path}")
-    print(f"  Config: {config_path}")
-    kmodel = KModel(repo_id="hexgrad/Kokoro-82M", config=config_path, model=model_path)
+    #print(f"  Config: {config_path}")
+    #kmodel = KModel(repo_id="hexgrad/Kokoro-82M", config=config_path, model=model_path)
+    kmodel = KModel(repo_id="hexgrad/Kokoro-82M", model=model_path)
     kmodel = kmodel.to(device).eval()
 
-    # Create pipeline with English lang_code
+    # Create pipeline with German lang_code
     pipeline = KPipeline(lang_code="a", repo_id="hexgrad/Kokoro-82M", model=kmodel)
 
     # Load voicepack
@@ -146,7 +140,7 @@ def run_inference(
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Test fine-tuned Kokoro German model",
+        description="Test fine-tuned Trained Kokoro model",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     group = parser.add_mutually_exclusive_group(required=True)
@@ -186,7 +180,7 @@ def main():
     if args.checkpoint:
         model_path = convert_checkpoint(
             args.checkpoint,
-            str(Path(args.output_dir) / "kokoro_german_converted.pth"),
+            str(Path(args.output_dir) / "kokoro_trained_converted.pth"),
         )
     else:
         model_path = args.model
@@ -199,6 +193,12 @@ def main():
         device=args.device,
     )
 
+    # Clean up temporary model file
+    if args.checkpoint:
+        converted_file = Path(model_path)
+        if converted_file.exists():
+            converted_file.unlink()
+            print(f"Cleaned up temporary model file: {converted_file}")
 
 if __name__ == "__main__":
     main()
