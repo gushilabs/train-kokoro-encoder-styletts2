@@ -95,8 +95,8 @@ model_params:
 
 # ── Loss Weights ─────────────────────────────────────────────────────────────
 loss_params:
-  lambda_gen: 1.0
-  lambda_mel: 5.0                   # mel reconstruction loss
+  lambda_gen: 0.5                   # 1.0 original
+  lambda_mel: 10.0                  # 5.0 mel reconstruction loss
   lambda_dur: 1.0                   # duration prediction loss
   lambda_ce: 20.0                   # duration cross-entropy loss
   lambda_F0: 1.0                    # F0 (pitch) prediction loss
