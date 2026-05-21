@@ -1,101 +1,15 @@
-# kokoro-deutsch
+# train-kokoro-encoder-styletts2
 
-Training recipe for fine-tuning [Kokoro-82M](https://github.com/hexgrad/kokoro) for German with a patched [StyleTTS2](https://github.com/yl4579/StyleTTS2) submodule.
+An experimental open-source attempt to retrain the missing **Kokoro TTS** encoders using a modified **StyleTTS2** framework to enable custom voice cloning.
 
-## What This Is
+## 📌 Project Purpose
+While Kokoro TTS is built on the StyleTTS2 architecture, the official public release only included the decoder weights. This repository is an empirical effort to reconstruct and retrain the missing style and text encoders. 
 
-- A reproducible fine-tuning workflow (dataset prep -> Stage 1 -> Stage 2 -> voicepack extraction)
-- Original scripts for data preparation and checkpoint/voicepack conversion
-- A patched `StyleTTS2/` submodule with the fixes required for stable Stage 2 training
+>  The training pipeline successfully runs, but initial audio synthesis results are sub-optimal. The current hypothesis is that independently training the encoders without the decoders might be insufficient, and joint training is likely required. This is open-sourced to share findings.
 
-## What This Is Not
+## 🙏 Background & Credits
+Initially, I attempted to use the vanilla [StyleTTS2](https://github.com/yl4579/StyleTTS2) training code to train the Kokoro encoders, but the codebase crashed frequently during adaptation. 
 
-- Not a general-purpose Kokoro replacement repository
-- Not a bundled upstream mirror of `demo/`, `examples/`, `kokoro.js/`, or `tests/`
-- Not a redistributable training dataset
+During my research, I discovered [semidark/kokoro-deutsch](https://github.com/semidark/kokoro-deutsch), an excellent repository that patched the StyleTTS2 code to successfully skip diffuser sampling. I modified and adapted the training logic from the `semidark` repository to get this specific Kokoro encoder training pipeline working. 
 
-## Start Here
-
-### I want to train my own German voice
-
-Start with `docs/TRAINING_GUIDE.md`.
-
-### I am debugging training failures
-
-Go to `docs/TROUBLESHOOTING.md`.
-
-### I want architecture details and compatibility notes
-
-See `docs/ARCHITECTURE.md`.
-
-## Status
-
-The end-to-end pipeline is working:
-
-`Dataset preparation -> Weight conversion -> Stage 1 -> Stage 2 -> Voicepack extraction -> KModel inference`
-
-## Published Model
-
-### German Multi-Speaker Base Model (Stage 1)
-
-**dida-80b/kokoro-deutsch-hui-base** is available on HuggingFace.
-
-| Specification | Value |
-|---|---|
-| Speakers | 51 (24M / 27F) |
-| Training Audio | ~51 hours (effective) |
-| Train Samples | 20,495 |
-| Val Samples | 418 |
-| Final Mel Loss | 0.3264 |
-| License | CC0-1.0 |
-| Model | [dida-80b/kokoro-deutsch-hui-base](https://huggingface.co/dida-80b/kokoro-deutsch-hui-base) |
-| Dataset | [dida-80b/hui-german-51speakers](https://huggingface.co/datasets/dida-80b/hui-german-51speakers) |
-
-This is a base model, not a finished single-speaker voice.
-
-## Quick Setup
-
-### Prerequisites
-
-```bash
-# Ubuntu/Debian
-sudo apt-get install espeak-ng libsndfile1
-
-# macOS
-brew install espeak-ng libsndfile
-```
-
-### Clone
-
-```bash
-git clone --recurse-submodules https://github.com/semidark/kokoro-deutsch
-cd kokoro-deutsch
-uv sync
-```
-
-## Repository Layout
-
-```text
-kokoro/              # Kokoro fork submodule (contains the `kokoro/` Python package)
-StyleTTS2/           # Patched training code (git submodule: semidark/StyleTTS2)
-scripts/             # Dataset prep, voicepack extraction, inference testing
-configs/             # Training config(s)
-docs/                # Training guide, troubleshooting, architecture notes
-training/            # Local training artifacts metadata (audio excluded)
-```
-
-## Contributing
-
-Contributions are welcome, especially:
-
-- Reproducible runs on public datasets
-- Fine-tuning recipes for other languages
-- Training stability and quality improvements
-
-## Attribution
-
-See `NOTICE` for upstream attribution and license details.
-
-## License
-
-Apache License 2.0 — see `LICENSE`.
+Massive credit and thanks to the author of `semidark/kokoro-deutsch` for the patched StyleTTS2 baseline!

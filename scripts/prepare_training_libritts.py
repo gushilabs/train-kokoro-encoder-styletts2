@@ -14,6 +14,7 @@ Usage:
 """
 
 import argparse
+from curses import meta
 import json
 import os
 import random
@@ -58,7 +59,15 @@ def cmd_prepare():
             parts = line.split("|", 2)
             if len(parts) == 3:
                 filename, text, speaker = parts
-                meta[filename] = {"text": text, "speaker": speaker}
+                
+                # Extract only the digits from the speaker string (e.g., "speaker260" -> "260")
+                speaker_id = "".join(filter(str.isdigit, speaker))
+                
+                # Fallback to "0" just in case a row is missing a number to prevent crashes
+                if not speaker_id:
+                    speaker_id = "0"
+                    
+                meta[filename] = {"text": text, "speaker": speaker_id}
 
     # Parse phonemes: filename|ipa
     phonemes = {}

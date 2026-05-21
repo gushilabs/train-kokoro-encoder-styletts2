@@ -46,39 +46,9 @@ Implication:
 Requirement:
 - `StyleTTS2/text_utils.py` must use Kokoro mapping (`kokoro_symbols.py`)
 
-## German G2P Notes
+## G2P Notes
 
 - G2P backend: `misaki` + `espeak-ng`
-- German code path uses `espeak.EspeakG2P(language='de')`
-- Symbol `ʏ` is not in Kokoro vocab and must be normalized to `y`
-
-## German Phoneme Compatibility
-
-All standard German phonemes are covered by Kokoro's 178-token set:
-
-| Sound | IPA | Unicode | Kokoro ID |
-|-------|-----|---------|-----------|
-| ich-Laut | `ç` | U+00E7 | 78 |
-| ach-Laut | `x` | U+0078 | 66 |
-| ö long | `ø` | U+00F8 | 116 |
-| ö short | `œ` | U+0153 | 120 |
-| ü long | `y` | U+0079 | 67 |
-| ts affricate | `ʦ` | U+02A6 | 20 |
-| schwa-r | `ɐ` | U+0250 | 70 |
-| sch | `ʃ` | U+0283 | 131 |
-| ng | `ŋ` | U+014B | 112 |
-| vowel length | `ː` | U+02D0 | 158 |
-| schwa | `ə` | U+0259 | 83 |
-| uvular r | `ʁ` | U+0281 | 128 |
-| glottal stop | `ʔ` | U+0294 | 148 |
-
-### Missing symbol
-
-| IPA | Unicode | Meaning | Fix |
-|-----|---------|---------|-----|
-| `ʏ` | U+028F | short ü | Map to `y` (U+0079) |
-
-`ʏ` is produced by `espeak-ng` for short ü (e.g., in "Bücher"). It is not in Kokoro's vocabulary. Replace it with `y` (long ü) in post-processing. The model learns the duration difference from the audio context.
 
 ### Diacritics (stress markers)
 

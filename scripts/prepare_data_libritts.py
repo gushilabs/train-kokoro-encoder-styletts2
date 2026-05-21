@@ -6,10 +6,10 @@ Processes the pre-transcribed LibriTTS-R dataset into Kokoro TTS format.
 
 Usage:
     # Step 1: Scan LibriTTS-R, read text, and filter
-    python prepare_libritts.py scan /path/to/LibriTTS_R/train-clean-100
+    python prepare_data_libritts.py scan /path/to/LibriTTS_R/train-clean-100
 
     # Step 2: Convert audio + generate IPA + write final dataset
-    python prepare_libritts.py format
+    python prepare_data_libritts.py format
 """
 
 import argparse

@@ -1,37 +1,45 @@
-kokoro-deutsch
-Copyright 2026 semidark
+train-kokoro-encoder-styletts2
+Copyright 2026 Gushilabs
 
-This project contains code from the following open-source projects:
-
-────────────────────────────────────────────────────────────────────────────────
-
-kokoro/ — Kokoro TTS inference package (git submodule)
-  Source:  https://github.com/hexgrad/kokoro
-  Fork:    https://github.com/semidark/kokoro (branch: main)
-  License: Apache License 2.0
-  Author:  hexgrad
-  Changes: Fork includes German language support (`'d'`) in pipeline/CLI.
+This project contains code derived from and inspired by the following open-source projects:
 
 ────────────────────────────────────────────────────────────────────────────────
 
-StyleTTS2/ — Training code (git submodule)
-  Source:  https://github.com/yl4579/StyleTTS2
-  Fork:    https://github.com/semidark/StyleTTS2 (branch: main)
-  License: MIT License
-  Author:  Yinghao Aaron Li (yl4579)
-  Changes: See the commit history on the main branch for a full
-           list of patches. Summary:
-           - Migrated weight_norm/spectral_norm to parametrizations API
-           - Fixed multiple training bugs (F0 shape, checkpoint save order,
-             missing .train() mode, hardcoded breakpoint, torch.load defaults)
-           - Added Kokoro-82M symbol table (kokoro_symbols.py)
-           - Filtered sequences exceeding PLBERT max length (meldataset.py)
+kokoro/ — Kokoro TTS inference package
+  Original Source:  https://github.com/hexgrad/kokoro
+  Upstream Fork:    https://github.com/semidark/kokoro
+  License:          Apache License 2.0
+  Original Author:  hexgrad
+  Fork Author:      semidark
+  Changes:          Integrated directly as a local directory. Retains structural 
+                    adaptations and German language support added by semidark.
 
 ────────────────────────────────────────────────────────────────────────────────
 
-The following directories contain original work by this project's contributors:
+StyleTTS2/ — Training code
+  Original Source:  https://github.com/yl4579/StyleTTS2
+  Upstream Fork:    https://github.com/semidark/StyleTTS2
+  License:          MIT License
+  Original Author:  Yinghao Aaron Li (yl4579)
+  Fork Author:      semidark
+  Changes:          Integrated directly as a local directory. Retains patches and 
+                    bug fixes made by semidark (e.g., bypassing diffuser sampling). 
+                    Further modified by Gushilabs to isolate and train the missing 
+                    Kokoro encoder architecture.
 
-  scripts/     — Dataset preparation, voicepack extraction, inference testing
-  configs/     — Training configuration for German fine-tuning
-  docs/        — Training guide and documentation
-  training/    — Training data lists and OOD texts (audio files excluded)
+────────────────────────────────────────────────────────────────────────────────
+
+kokoro-deutsch — Base training scripts and wrapper
+  Source:           https://github.com/semidark/kokoro-deutsch
+  License:          Apache License 2.0
+  Original Author:  semidark
+  Changes:          Initial base for dataset preparation, voicepack extraction, 
+                    and configuration files inherited from this project.
+
+────────────────────────────────────────────────────────────────────────────────
+
+The following sections contain subsequent modifications and original work by Gushilabs:
+
+  scripts/     — Modified dataset preparation, audio processing, and inference scripts.
+  configs/     — Tailored configurations targeting Kokoro encoder retraining.
+  README.md    — Project documentation outlining the experimental scope and objectives.

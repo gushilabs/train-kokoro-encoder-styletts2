@@ -1,8 +1,7 @@
 batch_size: 4 #4 reduce batch size for second stage to avoid CUDA OOM  (8 for first stage training and 4 for second stage)
 epochs: 10
 epochs_1st: 10
-epochs_2nd: 10
-epoch_leave: 100 # leave training after finish this epoch (for ablation, set to total epochs to complete full training)
+epochs_2nd: 10ave training after finish this epoch (for ablation, set to total epochs to complete full training)
 save_freq: 1
 max_len: 150 #200 Reduce because second stage training CUDA out of memory with long sequences
 pretrained_model: "../training/kokoro_base.pth"
@@ -10,12 +9,11 @@ first_stage_path: "first_stage.pth"
 load_only_params: true
 second_stage_load_pretrained: false  # false = load from first_stage.pth (recommended)
 # ─────────────────────────────────────────────────────────────────────────────
-# Kokoro German Fine-Tuning Config
+# Kokoro Encoder Training Config
 # ─────────────────────────────────────────────────────────────────────────────
-# Based on StyleTTS2 config_ft.yml, adapted for:
-# - Kokoro-82M architecture (ISTFTNet vocoder, no diffusion)
-# - German single-speaker fine-tuning (28h Daniel)
-# - Conservative fine-tuning from pre-trained English checkpoint
+# Based on Kokoro German Fine-Tuning Config 
+#  config_german_ft.yml
+# adapted for: Training in constrained compute environment (batch size 4, max_len 150) and for training from scratch (second_stage_load_pretrained: false).
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ── Logging ──────────────────────────────────────────────────────────────────
@@ -139,7 +137,6 @@ F0_path: "Utils/JDC/bst.t7"
 
 # ── ASR Alignment Model ─────────────────────────────────────────────────────
 # StyleTTS2's pre-trained alignment model (English)
-# May need to be adapted for German or set TMA_epoch=0 to learn from scratch
 ASR_config: "Utils/ASR/config.yml"
 ASR_path: "Utils/ASR/epoch_00080.pth"
 

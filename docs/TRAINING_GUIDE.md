@@ -1,10 +1,5 @@
 # Training Guide
 
-This guide is the practical path for fine-tuning Kokoro-82M for German.
-
-For deep debugging details, see `TROUBLESHOOTING.md`.
-For architecture and compatibility notes, see `ARCHITECTURE.md`.
-
 ## 1) Prerequisites
 
 ### Hardware
@@ -57,21 +52,11 @@ Create file lists in StyleTTS2 format:
 Requirements:
 - WAV, mono, 24kHz, 16-bit
 - Typical clip duration: 2–30s
-- Keep phoneme strings compatible with Kokoro symbols (see [Phoneme Compatibility](ARCHITECTURE.md#german-phoneme-compatibility))
-
-German G2P example:
-
-```python
-from misaki import espeak
-
-g2p = espeak.EspeakG2P(language='de')
-phonemes, _ = g2p(text)
-phonemes = phonemes.replace('ʏ', 'y')  # ʏ not in Kokoro vocab
-```
+- Keep phoneme strings compatible with Kokoro symbols (see [Phoneme Compatibility]
 
 Use:
-- `scripts/prepare_dataset.py`
-- `scripts/prepare_training.py`
+- `scripts/prepare_dataset_libritts.py`
+- `scripts/prepare_training_libritts.py`
 
 ## 3) Prepare Base Weights
 
@@ -136,7 +121,7 @@ python setup.py build_ext --inplace
 
 ## 6) Configure Training
 
-Primary config: `configs/config_german_ft.yml`
+Primary config: `configs/config.yml`
 
 ### Critical: Top-Level vs Nested Parameters
 
@@ -172,41 +157,13 @@ Before long runs, verify each component:
 3. **Forward + backward pass:** all losses are finite (not NaN or inf)
 4. **Run 2 training steps** and Ctrl+C after confirming non-NaN losses
 
-Healthy first-step losses (approximate):
-
-| Loss | Expected range |
-|------|---------------|
-| Mel Loss | 0.8–1.5 (drops fast) |
-| Gen Loss | 3–6 |
-| Disc Loss | 4–6 |
-| Mono Loss | 0.01–0.1 |
-| S2S Loss | 1–6 (drops over epochs) |
-| SLM Loss | 1–3 |
-
-Any NaN in Mel Loss is a red flag — most likely a symbol mapping problem.
-
 ## 8) Stage 1 Training
 
 Run from `StyleTTS2/`:
 
 ```bash
-accelerate launch train_first.py --config_path ../configs/config_german_ft.yml
+accelerate launch train_first.py --config_path ../configs/config.yml
 ```
-
-### Loss interpretation
-
-| Loss | What it means | Healthy trend |
-|------|--------------|---------------|
-| Mel Loss | Mel spectrogram reconstruction | 0.8 → 0.25 over 10 epochs |
-| Gen Loss | GAN generator vs discriminator | Stable 2.5–3.5 |
-| Disc Loss | GAN discriminator | Stable 3.8–4.2 |
-| Mono Loss | Monotonic alignment quality | < 0.05 — lower is better |
-| S2S Loss | Sequence-to-sequence alignment | Declining over time |
-| SLM Loss | WavLM feature matching | Stable or slowly declining |
-
-If Mel Loss plateaus above 0.4 after several epochs, check data quality, phoneme mapping, or learning rate.
-
-Checkpoints saved in `StyleTTS2/logs/<run>/`.
 
 ![Stage 1 TensorBoard](images/tensorboard_stage1.png)
 
@@ -215,7 +172,7 @@ Checkpoints saved in `StyleTTS2/logs/<run>/`.
 Run from `StyleTTS2/`:
 
 ```bash
-accelerate launch train_second.py --config_path ../configs/config_german_ft.yml
+accelerate launch train_second.py --config_path ../configs/config.yml
 ```
 
 ### Loss interpretation
@@ -240,7 +197,7 @@ Extract:
 
 ```bash
 python scripts/extract_voicepack.py \
-  --model StyleTTS2/logs/kokoro-deutsch/epoch_2nd_00009.pth \
+  --model epoch_2nd_00009.pth \
   --audio-dir path/to/audio \
   --output voices/dm_daniel.pt
 ```
@@ -249,7 +206,7 @@ Convert/test inference:
 
 ```bash
 python scripts/test_inference.py \
-  --checkpoint StyleTTS2/logs/kokoro-deutsch/epoch_2nd_00009.pth \
+  --checkpoint epoch_2nd_00009.pth \
   --voicepack voices/dm_daniel.pt \
   --output-dir test_output/
 ```
