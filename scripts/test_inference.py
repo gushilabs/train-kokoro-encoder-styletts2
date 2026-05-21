@@ -9,10 +9,10 @@ Pre-requisites:
     apt-get -qq -y install espeak-ng > /dev/null 2>&1
 
 Usage:
-    python test_inference.py \
-        --checkpoint ~/Downloads/models/Kokoro2nd-LibriTTS/epoch_2nd_00000.pth \
-        --voicepack voices/am_2nd_speaker78.pt \
-        --output-dir test_output/epoch0
+    python scripts/test_inference.py \
+        --model ~/Downloads/models/kokoro-v1_0/kokoro-v1_0.pth \
+        --voicepack voices/am_1epoch34_2epoch6_speaker5703.pt \
+        --output-dir test_output/epoch6
 
 """
 
@@ -30,51 +30,9 @@ TEST_SENTENCES = [
     "A swift red fox gracefully cleared the sleeping dog."
 ]
 
-def convert_checkpoint(checkpoint_path: str, output_path: str) -> str:
-    """Convert a StyleTTS2 Stage 2 checkpoint to Kokoro KModel format.
-
-    Extracts the 5 inference components (bert, bert_encoder, predictor,
-    text_encoder, decoder) from the training checkpoint. All state dict
-    keys must have the 'module.' prefix for KModel's loading fallback
-    to work correctly.
-
-    Requires that training was done with the new parametrizations API
-    (torch.nn.utils.parametrizations.weight_norm/spectral_norm) so the
-    state dict keys are natively compatible with Kokoro's KModel.
-    """
-    import torch
-
-    print(f"Converting checkpoint: {checkpoint_path}")
-    ckpt = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
-    net = ckpt["net"]
-
-    def ensure_module_prefix(state_dict):
-        """Ensure all keys have 'module.' prefix for KModel compatibility."""
-        return {
-            ("module." + k if not k.startswith("module.") else k): v
-            for k, v in state_dict.items()
-        }
-
-    kokoro_weights = {}
-    for key in ["bert", "bert_encoder", "predictor", "text_encoder", "decoder"]:
-        if key in net:
-            kokoro_weights[key] = ensure_module_prefix(net[key])
-            print(f"  {key}: {len(kokoro_weights[key])} keys")
-        else:
-            print(f"  WARNING: '{key}' not found in checkpoint")
-
-    output = Path(output_path)
-    output.parent.mkdir(parents=True, exist_ok=True)
-    torch.save(kokoro_weights, str(output))
-    size_mb = output.stat().st_size / (1024 * 1024)
-    print(f"  Saved Kokoro-format weights: {output} ({size_mb:.1f} MB)")
-    return str(output)
-
-
 def run_inference(
     model_path: str,
     voicepack_path: str,
-    config_path: str,
     output_dir: str,
     device: str = "auto",
 ):
@@ -89,8 +47,6 @@ def run_inference(
 
     # Load model with our fine-tuned weights and config
     print(f"Loading model from: {model_path}")
-    #print(f"  Config: {config_path}")
-    #kmodel = KModel(repo_id="hexgrad/Kokoro-82M", config=config_path, model=model_path)
     kmodel = KModel(repo_id="hexgrad/Kokoro-82M", model=model_path)
     kmodel = kmodel.to(device).eval()
 
@@ -139,10 +95,6 @@ def main():
     )
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(
-        "--checkpoint",
-        help="Path to StyleTTS2 checkpoint (.pth) — will be converted automatically",
-    )
-    group.add_argument(
         "--model",
         help="Path to already-converted Kokoro-format weights (.pth)",
     )
@@ -150,11 +102,6 @@ def main():
         "--voicepack",
         required=True,
         help="Path to voicepack (.pt)",
-    )
-    parser.add_argument(
-        "--config",
-        default="training/config.json",
-        help="Path to Kokoro config.json",
     )
     parser.add_argument(
         "--output-dir",
@@ -170,29 +117,14 @@ def main():
 
     args = parser.parse_args()
 
-    # Convert checkpoint if needed
-    if args.checkpoint:
-        model_path = convert_checkpoint(
-            args.checkpoint,
-            str(Path(args.output_dir) / "kokoro_trained_converted.pth"),
-        )
-    else:
-        model_path = args.model
+    model_path = args.model
 
     run_inference(
         model_path=model_path,
         voicepack_path=args.voicepack,
-        config_path=args.config,
         output_dir=args.output_dir,
         device=args.device,
     )
-
-    # Clean up temporary model file
-    if args.checkpoint:
-        converted_file = Path(model_path)
-        if converted_file.exists():
-            converted_file.unlink()
-            print(f"Cleaned up temporary model file: {converted_file}")
 
 if __name__ == "__main__":
     main()
