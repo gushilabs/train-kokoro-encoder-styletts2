@@ -20,12 +20,6 @@ import argparse
 import sys
 from pathlib import Path
 
-# Prefer the kokoro submodule over any pip-installed kokoro package
-#_repo_root = Path(__file__).resolve().parents[1]
-#_kokoro_submodule = _repo_root / "kokoro"
-#if _kokoro_submodule.exists() and str(_kokoro_submodule) not in sys.path:
-#    sys.path.insert(0, str(_kokoro_submodule))
-
 TEST_SENTENCES = [
     "The quick brown fox jumps over the lazy dog.",
     "Printing, in the only sense with which we are at present concerned, differs from most arts.",
@@ -84,7 +78,7 @@ def run_inference(
     output_dir: str,
     device: str = "auto",
 ):
-    """Run inference on the German test set."""
+    """Run inference on the test set."""
     import torch
     import soundfile as sf
     from kokoro import KModel, KPipeline
@@ -100,7 +94,7 @@ def run_inference(
     kmodel = KModel(repo_id="hexgrad/Kokoro-82M", model=model_path)
     kmodel = kmodel.to(device).eval()
 
-    # Create pipeline with German lang_code
+    # Create pipeline with lang_code
     pipeline = KPipeline(lang_code="a", repo_id="hexgrad/Kokoro-82M", model=kmodel)
 
     # Load voicepack
