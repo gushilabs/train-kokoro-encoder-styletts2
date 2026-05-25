@@ -1,4 +1,4 @@
-batch_size: 4 #4 reduce batch size for second stage to avoid CUDA OOM  (8 for first stage training and 4 for second stage)
+batch_size: 8 #4 reduce batch size for second stage to avoid CUDA OOM  (8 for first stage training and 4 for second stage)
 epochs: 10
 epochs_1st: 10
 epochs_2nd: 10
@@ -95,18 +95,18 @@ model_params:
 
 # ── Loss Weights ─────────────────────────────────────────────────────────────
 loss_params:
-  lambda_gen: 0.5                   # 1.0 original
-  lambda_mel: 10.0                  # 5.0 mel reconstruction loss
+  lambda_gen: 0.05                  # 1.0 original
+  lambda_mel: 15.0                  # 5.0 mel reconstruction loss
   lambda_dur: 1.0                   # duration prediction loss
   lambda_ce: 20.0                   # duration cross-entropy loss
-  lambda_F0: 1.0                    # F0 (pitch) prediction loss
+  lambda_F0: 2.0                    # F0 (pitch) prediction loss
   lambda_norm: 1.0                  # energy/norm prediction loss
   lambda_s2s: 1.0                   # sequence-to-sequence loss
   lambda_mono: 1.0                  # monotonic alignment loss
-  lambda_slm: 1.0                   # SLM adversarial (0 = disabled for stage 1)
+  lambda_slm: 0.05                  # SLM adversarial (0 = disabled for stage 1)
   lambda_diff: 0.0                  # diffusion loss (0 = disabled, no diffusion)
   lambda_sty: 0.0                   # style reconstruction (0 = disabled)
-  TMA_epoch: 0                      # start alignment from epoch 0 (fine-tuning, not training from scratch)
+  TMA_epoch: 6                     # start alignment from epoch 0 (fine-tuning, not training from scratch)
   diff_epoch: 999                   # effectively disable diffusion training
   joint_epoch: 3                    # start SLM joint training
 
@@ -114,7 +114,7 @@ loss_params:
 optimizer_params:
   lr: 0.0001                        # main learning rate
   bert_lr: 0.00001                  # lower LR for PLBERT (mostly frozen knowledge)
-  ft_lr: 0.0001                     # fine-tuning LR for acoustic modules
+  ft_lr: 0.00001                    # fine-tuning LR for acoustic modules
 
 # TODO: Remove this entire `training:` block — it is dead config.
 # Neither train_first.py nor train_second.py reads from config["training"].

@@ -7,11 +7,8 @@ both style encoders (acoustic + prosodic) on representative utterances and
 averaging the resulting style vectors.
 
 Usage:
-    # Two checkpoints (recommended after Stage 2 training):
-    #   style_encoder from Stage 1, predictor_encoder from Stage 2
     python scripts/extract_voicepack.py \
         --model ~/Downloads/models/epoch_2nd_00006.pth \
-        --style-encoder-model ~/Downloads/models/epoch_1st_00034.pth \
         --audio-dir ~/Download/LibriTTSClean100/Data/wavs/speaker_5703 \
         --output voices/am_1epoch34_2epoch6_speaker5703.pt
 
