@@ -127,26 +127,7 @@ Primary config: `configs/config.yml`
 
 `train_first.py` reads critical parameters from the **top level** of the YAML, not from the nested `training:` block:
 
-```python
-# These read from TOP LEVEL — not from training:
-batch_size = config.get("batch_size", 10)
-epochs = config.get("epochs_1st", 200)
-saving_epoch = config.get("save_freq", 2)
-pretrained_model = config["pretrained_model"]
-load_only_params = config.get("load_only_params", True)
-```
-
-If you put these only inside `training:`, they will be silently ignored and defaults will be used. Always set them at the top level.
-
 ### Important Stage 2 Settings
-
-```yaml
-second_stage_load_pretrained: false  # load from first_stage.pth (recommended)
-joint_epoch: 3                       # start adversarial training at epoch 3
-lambda_slm: 1.0                      # enable SLM adversarial loss
-```
-
-See `TROUBLESHOOTING.md` for why these values matter.
 
 ## 7) Smoke Test
 
@@ -175,20 +156,6 @@ Run from `StyleTTS2/`:
 accelerate launch train_second.py --config_path ../configs/config.yml
 ```
 
-### Loss interpretation
-
-| Loss | What it means | Healthy trend |
-|------|--------------|---------------|
-| Mel Loss | Mel reconstruction with predicted prosody | ~0.43 at start, declining to ~0.25 |
-| Dur Loss | Duration prediction accuracy | 1.3 → 0.9 over 10 epochs |
-| CE Loss | Alignment cross-entropy | 0.18 → 0.05 |
-| Norm Loss | Energy prediction | 3.0 → 0.8 (noisy) |
-| F0 Loss | Pitch contour prediction | 4.1 → 1.8 over 10 epochs |
-| Gen/Disc Loss | GAN discriminator losses | Activate at `joint_epoch`, stable ~2–4 |
-| SLM Loss | WavLM adversarial loss | Activate at `joint_epoch`, stable ~1–3 |
-
-**Key indicator:** Stage 2 Mel loss should start at **~0.43** (pretrained weights loaded correctly), not **~7.5–8.0** (random initialization). If you see Mel loss starting above 2.0, see `TROUBLESHOOTING.md`.
-
 ![Stage 2 TensorBoard](images/tensorboard_stage2-try2.png)
 
 ## 10) Extract Voicepack and Test Inference
@@ -197,30 +164,16 @@ Extract:
 
 ```bash
 python scripts/extract_voicepack.py \
-  --model epoch_2nd_00009.pth \
-  --audio-dir path/to/audio \
-  --output voices/dm_daniel.pt
+  --model models/epoch_2nd_00006.pth \
+  --audio-dir LibriTTSClean100/Data/wavs/speaker_5703 \
+  --output voices/am_2epoch6_speaker5703.pt
 ```
 
 Convert/test inference:
 
 ```bash
-python scripts/test_inference.py \
-  --checkpoint epoch_2nd_00009.pth \
-  --voicepack voices/dm_daniel.pt \
-  --output-dir test_output/
+  python scripts/test_inference.py \
+    --model models/kokoro-v1_0/kokoro-v1_0.pth \
+    --voicepack voices/am_2epoch6_speaker5703.pt \
+    --output-dir test_output/epoch6
 ```
-
-## 11) Quick Checklist
-
-- [ ] System dependencies installed (espeak-ng, libsndfile)
-- [ ] Dataset lists are valid
-- [ ] Symbol mapping is Kokoro-compatible (178 tokens)
-- [ ] Base weights converted
-- [ ] Utility models downloaded
-- [ ] Config uses top-level keys (not nested `training:` block)
-- [ ] Smoke test passes with finite losses
-- [ ] Stage 1 completes and checkpoints save
-- [ ] Stage 2 starts from trained weights (Mel ~0.43, not ~7.5)
-- [ ] Voicepack extraction succeeds
-- [ ] Inference audio is intelligible
