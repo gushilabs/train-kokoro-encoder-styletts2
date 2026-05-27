@@ -41,6 +41,7 @@ test_output/
 # ── Voicepacks (derived from non-redistributable data) ─────────────────────
 voices/*.pt
 voices/*.bin
+voices/*
 
 # ── Backup and temp files ───────────────────────────────────────────────────
 *.bak
