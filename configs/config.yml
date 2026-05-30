@@ -1,7 +1,7 @@
 batch_size: 4 #4 reduce batch size for second stage to avoid CUDA OOM  (8 for first stage training and 4 for second stage)
-epochs: 10
+epochs: 20
 epochs_1st: 30
-epochs_2nd: 10
+epochs_2nd: 20
 save_freq: 1
 max_len: 150 #200 Reduce because second stage training CUDA out of memory with long sequences
 pretrained_model: "../training/kokoro_base.pth"
