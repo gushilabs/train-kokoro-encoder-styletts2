@@ -160,6 +160,10 @@ accelerate launch train_second.py --config_path ../configs/config.yml
 
 ## 10) Extract Voicepack and Test Inference
 
+Pre-requisites:
+    pip install -q kokoro>=0.9.4 soundfile
+    apt-get -qq -y install espeak-ng > /dev/null 2>&1
+    
 Extract:
 
 ```bash
