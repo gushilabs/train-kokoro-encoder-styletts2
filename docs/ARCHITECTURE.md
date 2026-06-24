@@ -20,44 +20,9 @@ Reference component sizes used for checkpoint compatibility checks:
 Voicepack target shape:
 - `[510, 1, 256]` (float32)
 
-## weight_norm API Compatibility
-
-### Why it matters
-
-Old API (`torch.nn.utils.weight_norm`) and new API (`torch.nn.utils.parametrizations.weight_norm`) create different state-dict key layouts.
-
-If StyleTTS2 is trained with old API and inference expects new API, checkpoint loading can be brittle and may fail silently under non-strict loading paths.
-
-### Required status
-
-StyleTTS2 patched files must use new parametrizations API:
-- `StyleTTS2/models.py`
-- `StyleTTS2/Modules/istftnet.py`
-- `StyleTTS2/Modules/hifigan.py`
-- `StyleTTS2/Modules/discriminators.py`
-
-## Symbol Mapping Compatibility
-
-Kokoro and default StyleTTS2 use different token index assignments.
-
-Implication:
-- same symbol set size does not imply index compatibility
-
-Requirement:
-- `StyleTTS2/text_utils.py` must use Kokoro mapping (`kokoro_symbols.py`)
-
 ## G2P Notes
 
 - G2P backend: `misaki` + `espeak-ng`
-
-### Diacritics (stress markers)
-
-| Symbol | Meaning | Kokoro ID |
-|--------|---------|-----------|
-| `ˈ` | primary stress | 156 |
-| `ˌ` | secondary stress | 157 |
-
-These are produced by `espeak-ng` and are in Kokoro's vocabulary. Do not strip them.
 
 ## Sequence Length Constraint
 

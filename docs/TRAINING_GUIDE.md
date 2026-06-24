@@ -156,7 +156,7 @@ Run from `StyleTTS2/`:
 accelerate launch train_second.py --config_path ../configs/config.yml
 ```
 
-![Stage 2 TensorBoard](images/tensorboard_stage2-try2.png)
+![Stage 2 TensorBoard](images/tensorboard_stage2.png)
 
 ## 10) Extract Voicepack and Test Inference
 
