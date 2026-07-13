@@ -5,7 +5,16 @@ An experimental open-source attempt to retrain the missing **Kokoro TTS** encode
 ## 📌 Project Purpose
 While Kokoro TTS is based on StyleTTS2, its official release only included the decoder weights. This project is an experimental attempt to retrain the missing encoders to explore custom voice cloning and generate new voice packs.
 
-##  Current State
+## 💡 Motivation & Core Architecture Insights
+When analyzing the architectural differences between Kokoro TTS and StyleTTS2, a key distinction stands out: the removal of the **Style Diffusion Denoiser** module.
+
+Furthermore, the official Kokoro voicepack tensor shapes and file sizes align perfectly with the dimensions required by the original StyleTTS2 architecture. This heavily implies that the **Prosodic Style Encoder** and **Acoustic Style Encoder** were actively utilized during the initial training of Kokoro but simply withheld from the public release.
+
+This project aims to reconstruct those missing components to unlock the full potential of the model's architecture.
+
+![Kokoro vs StyleTTS2 Architecture Diagram](docs/images/kokoro_vs_style_tts2.jpg)
+
+## 📊 Current State
 The training pipeline runs successfully, but initial zero-shot voice cloning results are sub-optimal. According to the original author of Kokoro TTS, high-quality voice cloning may not be achievable under these conditions due to limited training data and time.
 
 However, the pipeline has successfully trained a voice pack encoder. The resulting voice packs are fully functional and compatible with the official Kokoro V1 release model. This repository is open-sourced to share these findings and artifacts with the community.
